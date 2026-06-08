@@ -1,0 +1,47 @@
+{
+  "name": "onchainmind",
+  "version": "1.0.0",
+  "description": "OnchainMind — Composable MCP Skills for Pharos AI Agent Ecosystem",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint src/**/*.ts",
+    "test": "jest --config jest.config.json"
+  },
+  "keywords": [
+    "pharos",
+    "mcp",
+    "ai-agent",
+    "web3",
+    "blockchain",
+    "onchain",
+    "defi",
+    "skill",
+    "composable",
+    "agent-skill"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "ethers": "^6.13.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.0",
+    "@types/jest": "^29.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/onchainmind/onchainmind.git"
+  }
+}

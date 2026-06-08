@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  onchainmind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: onchainmind-mcp
+    ports:
+      - "3001:3001"
+    environment:
+      - PHAROS_RPC_URL=${PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
+      - MCP_TRANSPORT=stdio
+      - LOG_LEVEL=info
+      - CACHE_TTL_MS=30000
+      - RETRY_MAX_ATTEMPTS=3
+      - RETRY_BASE_DELAY_MS=1000
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+
+  onchainmind-sse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: onchainmind-mcp-sse
+    ports:
+      - "3002:3002"
+    environment:
+      - PHAROS_RPC_URL=${PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
+      - MCP_TRANSPORT=sse
+      - SSE_PORT=3002
+      - LOG_LEVEL=info
+    restart: unless-stopped

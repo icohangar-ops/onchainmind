@@ -1,0 +1,26 @@
+{
+  "pharosRpcUrl": "https://testnet.pharosnetwork.xyz",
+  "pharosChainId": 688,
+  "pharosChainName": "Pharos Testnet",
+  "logLevel": "info",
+  "cacheTtlMs": 30000,
+  "retryMaxAttempts": 3,
+  "retryBaseDelayMs": 1000,
+  "mcpTransport": "stdio",
+  "ssePort": 3002,
+  "supportedChains": [
+    {
+      "id": 688,
+      "name": "Pharos Testnet",
+      "rpcUrl": "https://testnet.pharosnetwork.xyz",
+      "chainType": "evm",
+      "currency": {
+        "symbol": "PROS",
+        "decimals": 18
+      }
+    }
+  ],
+  "dexProtocols": ["UniswapV2", "UniswapV3", "PancakeSwap"],
+  "whaleThresholdUsd": 100000,
+  "riskScoreThreshold": 60
+}
