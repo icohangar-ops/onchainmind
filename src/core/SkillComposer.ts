@@ -184,7 +184,7 @@ class SkillComposerSingleton {
   }
 
   /** Build auto-mapping that passes all previous data forward */
-  private buildPassThroughMapping(stepIndex: number, totalSteps: number): Record<string, string> {
+  private buildPassThroughMapping(stepIndex: number, _totalSteps: number): Record<string, string> {
     if (stepIndex === 0) {
       return {};
     }

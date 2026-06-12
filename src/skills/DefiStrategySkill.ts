@@ -17,7 +17,6 @@ import type {
   YieldOpportunity,
   ImpermanentLossResult,
   GasOptimization,
-  DefiStrategyInput,
 } from "../utils/types";
 import { MemoryCache } from "../utils/cache";
 import { createLogger } from "../utils/logger";

@@ -442,7 +442,7 @@ export const RiskGuardSkill: Skill = {
             overallRisk,
             riskScore,
             checks,
-            honeypotScore: Math.round((1 - honeypot.canSell ? 0.9 : honeypot.sellTax / 100) * 100) / 100,
+            honeypotScore: Math.round((honeypot.canSell ? honeypot.sellTax / 100 : 0.9) * 100) / 100,
             rugPullProbability,
             recommendation,
           };

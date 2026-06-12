@@ -9,6 +9,12 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import type { IncomingMessage, ServerResponse } from "http";
+// Import from "zod/v3" so the schema types match the declaration tree used by
+// @modelcontextprotocol/sdk (which imports "zod/v3"); importing from the "zod"
+// root resolves to a parallel .d.cts tree and triggers TS2589 deep-instantiation
+// errors when the two are structurally compared. Runtime behavior is identical.
+import { z } from "zod/v3";
 import { skillRegistry } from "./SkillRegistry";
 import { createLogger } from "../utils/logger";
 import type { OnchainMindConfig } from "../utils/types";
@@ -24,7 +30,7 @@ const logger = createLogger("info", "MCPServer");
  * @param config - Server configuration
  * @returns The configured MCP server instance
  */
-export function createOnchainMindServer(config: OnchainMindConfig): McpServer {
+export function createOnchainMindServer(_config: OnchainMindConfig): McpServer {
   logger.info("Initializing OnchainMind MCP Server...");
 
   const server = new McpServer({
@@ -142,8 +148,8 @@ export function createOnchainMindServer(config: OnchainMindConfig): McpServer {
   server.tool(
     "onchainmind_skill_details",
     "Get detailed information about a specific OnchainMind skill, including all available tools and their input schemas.",
-    { skillName: { type: "string", description: "The name of the skill to inspect" } },
-    async (input: Record<string, unknown>) => {
+    { skillName: z.string().describe("The name of the skill to inspect") },
+    async (input) => {
       const name = input.skillName as string;
       const skill = skillRegistry.get(name);
       if (!skill) {
@@ -202,7 +208,7 @@ export async function startSSEServer(config: OnchainMindConfig): Promise<void> {
   const server = createOnchainMindServer(config);
   const httpServer = await import("http").then((http) => http.createServer());
 
-  httpServer.on("request", async (req: { method: string; url?: string }, res: { writeHead: (status: number, headers?: Record<string, string>) => void; end: () => void }) => {
+  httpServer.on("request", async (req: IncomingMessage, res: ServerResponse) => {
     if (req.method === "GET" && req.url === "/sse") {
       const sseTransport = new SSEServerTransport("/messages", res);
       await server.connect(sseTransport);

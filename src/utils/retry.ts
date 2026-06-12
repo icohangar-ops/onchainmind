@@ -94,7 +94,7 @@ export function createRetryable<T extends (...args: never[]) => Promise<unknown>
   fn: T,
   options: Partial<RetryOptions> = {}
 ): T {
-  return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+  return (async (...args: Parameters<T>) => {
     return withRetry(() => fn(...args), options);
   }) as T;
 }

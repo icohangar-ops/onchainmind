@@ -15,6 +15,9 @@ import { createLogger } from "../utils/logger";
 
 const logger = createLogger("info", "ConfigLoader");
 
+/** Mutable view of the config used while layering values during load. */
+type MutableConfig = { -readonly [K in keyof OnchainMindConfig]: OnchainMindConfig[K] };
+
 /** Built-in default configuration values */
 const DEFAULTS: OnchainMindConfig = {
   pharosRpcUrl: "https://testnet.pharosnetwork.xyz",
@@ -40,7 +43,7 @@ const DEFAULTS: OnchainMindConfig = {
  */
 export function loadConfig(configPath?: string): OnchainMindConfig {
   // Start with built-in defaults
-  const config: OnchainMindConfig = { ...DEFAULTS };
+  const config: MutableConfig = { ...DEFAULTS };
 
   // Layer 2: Load from default.json (or custom path)
   try {
@@ -83,7 +86,7 @@ export function loadConfig(configPath?: string): OnchainMindConfig {
   for (const mapping of envMappings) {
     const value = process.env[mapping.env];
     if (value !== undefined && value !== "") {
-      (config as Record<string, unknown>)[mapping.key] = mapping.parser(value);
+      (config as Record<keyof OnchainMindConfig, unknown>)[mapping.key] = mapping.parser(value);
       logger.debug(`Config override from env: ${mapping.env} = ${value}`);
     }
   }

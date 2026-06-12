@@ -16,7 +16,6 @@ import type {
   SkillResult,
   PortfolioPosition,
   PortfolioAggregation,
-  PortfolioInput,
 } from "../utils/types";
 import { MemoryCache } from "../utils/cache";
 import { createLogger } from "../utils/logger";
@@ -25,7 +24,7 @@ const logger = createLogger("info", "PortfolioSkill");
 const cache = new MemoryCache<PortfolioAggregation>(45_000);
 
 async function fetchPositionsFromChain(
-  walletAddress: string,
+  _walletAddress: string,
   chains: string[]
 ): Promise<PortfolioPosition[]> {
   // In production: scan Pharos DEX positions, lending protocols, staking contracts

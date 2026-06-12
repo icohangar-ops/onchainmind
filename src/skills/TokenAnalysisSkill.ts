@@ -13,10 +13,8 @@
 
 import type {
   Skill,
-  ToolDefinition,
   SkillResult,
   TokenMetrics,
-  TokenAnalysisInput,
   PricePoint,
   WhaleAlert,
   LiquidityDepth,
@@ -33,7 +31,6 @@ async function fetchTokenDataFromChain(tokenAddress: string): Promise<TokenMetri
   // In production, this would call PharosAdapter for real on-chain data
   // via DEX router contracts and Pharos RPC
   return withRetry(async () => {
-    const now = Date.now();
     // Simulated realistic data structure — production would be actual on-chain reads
     const price = 0.00042 + Math.random() * 0.001;
     return {
