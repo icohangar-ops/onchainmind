@@ -106,7 +106,7 @@ OnchainMind is designed as the **intelligence layer for Pharos AI Agents**. It i
 
 ```bash
 # Clone the repository
-git clone https://github.com/Cubiczan/onchainmind.git
+git clone https://github.com/icohangar-ops/onchainmind.git
 cd onchainmind
 
 # Install dependencies
