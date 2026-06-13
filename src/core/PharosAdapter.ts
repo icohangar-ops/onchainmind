@@ -7,8 +7,8 @@
  */
 
 import { type Logger, createLogger } from "../utils/logger";
-import { withRetry } from "../utils/retry";
 import type { ChainConfig } from "../utils/types";
+import { safeFetch } from "../lib/resilience";
 
 interface TransactionReceipt {
   readonly hash: string;
@@ -60,33 +60,35 @@ export class PharosAdapter {
    * Execute an RPC call with retry logic
    */
   private async rpcCall(method: string, params: unknown[]): Promise<unknown> {
-    return withRetry(
-      async () => {
-        const response = await fetch(this.rpcUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            id: Date.now(),
-            method,
-            params,
-          }),
-          signal: AbortSignal.timeout(this.requestTimeout),
-        });
+    // Outbound RPC is routed through the vendored safeFetch primitive, which
+    // applies a per-attempt timeout (AbortController) plus exponential backoff
+    // with jitter on transport errors and retryable HTTP statuses (429/5xx).
+    // JSON-RPC application errors (the `error` field) are non-transient, so
+    // they are surfaced to the caller rather than retried.
+    const response = await safeFetch(this.rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: Date.now(),
+        method,
+        params,
+      }),
+      timeoutMs: this.requestTimeout,
+      maxAttempts: 3,
+      baseDelayMs: 500,
+    });
 
-        if (!response.ok) {
-          throw new Error(`RPC call failed: HTTP ${response.status}`);
-        }
+    if (!response.ok) {
+      throw new Error(`RPC call failed: HTTP ${response.status}`);
+    }
 
-        const json = await response.json() as { result?: unknown; error?: { message: string } };
-        if (json.error) {
-          throw new Error(`RPC error: ${json.error.message}`);
-        }
+    const json = await response.json() as { result?: unknown; error?: { message: string } };
+    if (json.error) {
+      throw new Error(`RPC error: ${json.error.message}`);
+    }
 
-        return json.result;
-      },
-      { maxAttempts: 3, baseDelayMs: 500 }
-    );
+    return json.result;
   }
 
   /**

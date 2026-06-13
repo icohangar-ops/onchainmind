@@ -18,6 +18,7 @@ import { z } from "zod/v3";
 import { skillRegistry } from "./SkillRegistry";
 import { createLogger } from "../utils/logger";
 import type { OnchainMindConfig } from "../utils/types";
+import { requireAuth } from "../lib/resilience";
 
 const logger = createLogger("info", "MCPServer");
 
@@ -208,12 +209,38 @@ export async function startSSEServer(config: OnchainMindConfig): Promise<void> {
   const server = createOnchainMindServer(config);
   const httpServer = await import("http").then((http) => http.createServer());
 
+  // Fail-closed bearer auth for the SSE transport. The /sse and /messages
+  // endpoints expose every registered skill (portfolio, DeFi strategy, risk)
+  // over HTTP, so they must not be reachable unauthenticated. The expected
+  // token comes from ONCHAINMIND_AUTH_TOKEN; when it is unset, requireAuth
+  // returns 503 (misconfigured) and never degrades to allowing the request.
+  const authToken = process.env.ONCHAINMIND_AUTH_TOKEN;
+
+  /** Reject the Node response per a requireAuth failure; returns true if rejected. */
+  const rejectIfUnauthorized = (req: IncomingMessage, res: ServerResponse): boolean => {
+    const headers = new Headers();
+    const authHeader = req.headers["authorization"];
+    if (typeof authHeader === "string") headers.set("authorization", authHeader);
+
+    const result = requireAuth(new Request("http://local/", { headers }), {
+      token: authToken,
+    });
+    if (result.ok) return false;
+
+    logger.warn(`SSE request rejected (${result.status}): ${result.reason}`);
+    res.writeHead(result.status, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: result.reason }));
+    return true;
+  };
+
   httpServer.on("request", async (req: IncomingMessage, res: ServerResponse) => {
     if (req.method === "GET" && req.url === "/sse") {
+      if (rejectIfUnauthorized(req, res)) return;
       const sseTransport = new SSEServerTransport("/messages", res);
       await server.connect(sseTransport);
       logger.info(`SSE client connected (transport: /messages)`);
     } else if (req.method === "POST" && req.url === "/messages") {
+      if (rejectIfUnauthorized(req, res)) return;
       // Handle POST messages — handled by SSEServerTransport internally
     } else {
       res.writeHead(200, { "Content-Type": "application/json" });
