@@ -2,13 +2,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci --only=production
+# Install all dependencies (including devDependencies) so the TypeScript
+# compiler is available for the build step below.
+RUN npm install
 
 COPY tsconfig.json ./
 COPY src/ ./src/
 
-# Build TypeScript
-RUN npm run build
+# Build TypeScript, then drop devDependencies so the runtime image stays slim.
+RUN npm run build && npm prune --omit=dev
 
 # Production image
 FROM node:20-alpine AS runner

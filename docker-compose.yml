@@ -9,12 +9,12 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - PHAROS_RPC_URL=${PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
-      - MCP_TRANSPORT=stdio
-      - LOG_LEVEL=info
-      - CACHE_TTL_MS=30000
-      - RETRY_MAX_ATTEMPTS=3
-      - RETRY_BASE_DELAY_MS=1000
+      - ONCHAINMIND_PHAROS_RPC_URL=${ONCHAINMIND_PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
+      - ONCHAINMIND_MCP_TRANSPORT=stdio
+      - ONCHAINMIND_LOG_LEVEL=info
+      - ONCHAINMIND_CACHE_TTL_MS=30000
+      - ONCHAINMIND_RETRY_MAX_ATTEMPTS=3
+      - ONCHAINMIND_RETRY_BASE_DELAY_MS=1000
     volumes:
       - ./config:/app/config
     restart: unless-stopped
@@ -27,8 +27,9 @@ services:
     ports:
       - "3002:3002"
     environment:
-      - PHAROS_RPC_URL=${PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
-      - MCP_TRANSPORT=sse
-      - SSE_PORT=3002
-      - LOG_LEVEL=info
+      - ONCHAINMIND_PHAROS_RPC_URL=${ONCHAINMIND_PHAROS_RPC_URL:-https://testnet.pharosnetwork.xyz}
+      - ONCHAINMIND_MCP_TRANSPORT=sse
+      - ONCHAINMIND_SSE_PORT=3002
+      - ONCHAINMIND_LOG_LEVEL=info
+      - ONCHAINMIND_AUTH_TOKEN=${ONCHAINMIND_AUTH_TOKEN:-}
     restart: unless-stopped
