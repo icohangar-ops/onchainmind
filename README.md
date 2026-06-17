@@ -160,6 +160,9 @@ For SSE transport:
 | `ONCHAINMIND_SSE_PORT` | `3002` | SSE server port |
 | `ONCHAINMIND_CACHE_TTL_MS` | `30000` | Cache TTL in milliseconds |
 | `ONCHAINMIND_RETRY_MAX_ATTEMPTS` | `3` | Max retry attempts |
+| `ONCHAINMIND_AUTH_TOKEN` | (unset) | Bearer token for the SSE transport. Required when transport is `sse`; the SSE endpoints fail closed with HTTP 503 when it is unset. Unused for stdio. |
+
+See [.env.example](./.env.example) for a copyable template.
 
 ---
 
@@ -496,4 +499,4 @@ MIT License — see [LICENSE](./LICENSE) for details.
 
 ---
 
-Built with ❤️ for the Pharos AI Agent Ecosystem — **Pharos Phase 1 Skill Hackathon**
+Built for the Pharos AI Agent Ecosystem — **Pharos Phase 1 Skill Hackathon**
