@@ -18,6 +18,16 @@ const logger = createLogger("info", "ConfigLoader");
 /** Mutable view of the config used while layering values during load. */
 type MutableConfig = { -readonly [K in keyof OnchainMindConfig]: OnchainMindConfig[K] };
 
+/**
+ * Reject a resolved path that escapes `base` (relative traversal / file inclusion).
+ * `target` and `base` must already be resolved (or realpath'd).
+ */
+function assertInsideBase(target: string, base: string, sep: string): void {
+  if (target !== base && !target.startsWith(base + sep)) {
+    throw new Error("Config path is outside the project directory");
+  }
+}
+
 /** Built-in default configuration values */
 const DEFAULTS: OnchainMindConfig = {
   pharosRpcUrl: "https://testnet.pharosnetwork.xyz",
@@ -49,10 +59,17 @@ export function loadConfig(configPath?: string): OnchainMindConfig {
   try {
     const fs = require("fs");
     const path = require("path");
-    const resolvedPath = configPath ?? path.join(__dirname, "..", "config", "default.json");
+    // src/utils or dist/utils → repository root
+    const projectRoot = path.resolve(__dirname, "..", "..");
+    const candidate = configPath ?? path.join(__dirname, "..", "config", "default.json");
+    const resolvedPath = path.resolve(candidate);
+    assertInsideBase(resolvedPath, projectRoot, path.sep);
 
     if (fs.existsSync(resolvedPath)) {
-      const fileContent = fs.readFileSync(resolvedPath, "utf-8");
+      const realRoot = fs.realpathSync(projectRoot);
+      const realPath = fs.realpathSync(resolvedPath);
+      assertInsideBase(realPath, realRoot, path.sep);
+      const fileContent = fs.readFileSync(realPath, "utf-8");
       const fileConfig = JSON.parse(fileContent);
 
       if (fileConfig.pharosRpcUrl) config.pharosRpcUrl = fileConfig.pharosRpcUrl;
