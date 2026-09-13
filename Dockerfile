@@ -25,4 +25,6 @@ ENV MCP_TRANSPORT=stdio
 
 EXPOSE 3001 3002
 
+USER node
+
 CMD ["node", "dist/index.js"]
