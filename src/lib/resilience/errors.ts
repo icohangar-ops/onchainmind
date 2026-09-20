@@ -1,16 +1,14 @@
 /**
- * Vendored from cubiczan-resilience (typescript/src/errors.ts).
- * No npm registry available — copied verbatim except relative import
- * extensions stripped for this repo's commonjs/extensionless module style.
+ * VENDORED COPY — keep in sync with the canonical package.
  *
- * Discriminated reasons a resilient operation can ultimately fail.
+ * Vendored from @cubiczan/resilience (icohangar-ops/cubiczan-resilience,
+ * typescript/src) at typescript-v0.2.0
+ * (commit 37ce1571f5beb751d153ecdc3b1457cd9c871e37).
+ * Check the canonical package for updates before modifying locally; this
+ * copy's scope and intentional local deltas are recorded in VENDOR_COMMIT.txt
+ * beside this file.
  *
- * - `timeout`     — an attempt exceeded its allotted time budget.
- * - `network`     — the underlying transport (e.g. fetch) threw / connection failed.
- * - `http`        — the server returned a non-OK status that we treat as a failure.
- * - `ssrf`        — the target host was rejected by the SSRF allowlist hook.
- * - `exhausted`   — all retry attempts were used up.
- * - `aborted`     — the caller's own AbortSignal aborted the operation.
+ * Local adaptation: No npm registry available — copied verbatim except relative import extensions stripped for this repo's commonjs/extensionless module style.
  */
 export type ResilienceErrorKind =
   | "timeout"
